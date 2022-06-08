@@ -1,4 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+export const login = createAsyncThunk("auth/login", async (data, thunkAPI) => {
+  const { idProvider, provider, name, profilePic } = data;
+  const user = await axios.post("/api/auth/login", {
+    idProvider,
+    provider,
+    name,
+    profilePic,
+  });
+
+  return {
+    ...data,
+    id: user.data.id,
+  };
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -13,26 +29,29 @@ const authSlice = createSlice({
     },
   },
   reducers: {
-    login(state, action) {
-      state.logged = true;
-      state.loading = false;
-      state.user.id = action.payload.id;
-      state.name = action.payload.name;
-      state.user.email = action.payload.email;
-      state.user.profilePic = action.payload.profilePic;
-    },
     logout(state, action) {
       state.logged = false;
       state.loading = false;
       state.user.id = "";
-      state.name = "";
+      state.user.name = "";
       state.user.email = "";
       state.user.profilePic = "";
     },
   },
+  extraReducers(builder) {
+    builder.addCase(login.fulfilled, (state, action) => {
+      state.logged = true;
+      state.loading = false;
+      state.user.id = action.payload.id;
+      state.user.name = action.payload.name;
+      state.user.email = action.payload.email;
+      state.user.profilePic = action.payload.profilePic;
+    });
+  },
 });
 
 const authReducer = authSlice.reducer;
-export const { login, logout } = authSlice.actions;
 
 export default authReducer;
+
+export const { logout } = authSlice.actions;

@@ -1,27 +1,38 @@
-import { onAuthStateChanged } from "firebase/auth";
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { auth } from "../config/firebase";
-import { login, logout } from "../features/auth";
+import React, { useEffect } from 'react'
+import {onAuthStateChanged} from 'firebase/auth'
+import {auth} from '../config/firebase'
+import {useDispatch} from 'react-redux'
+import { login, logout } from '../features/auth'
+import Navbar from './Navbar'
+import { getAllPosts } from '../features/posts'
 
-export default function Page() {
-  const dispatch = useDispatch();
+export default function Page({children}) {
+    const dispatch = useDispatch()
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (authResult) => {
-      if (authResult) {
-        dispatch(
-          login({
-            id: authResult.uid,
-            name: authResult.name,
-            email: authResult.email,
-            profilePic: authResult.photoURL,
-          })
-        );
-      } else {
-        dispatch(logout());
-      }
-    });
-  },[dispatch]);
-  return <div>Page</div>;
+    useEffect(()=>{
+        onAuthStateChanged(auth,(authResult)=>{
+            if(authResult){
+                console.log(authResult)
+                dispatch(login({
+                    email:authResult.email,
+                    name:authResult.displayName,
+                    profilePic:authResult.photoURL,
+                    provider:authResult.providerId,
+                    idProvider:authResult.uid
+                }))
+                .then(()=>{
+                    dispatch(getAllPosts())
+                })
+                
+            }else{
+                dispatch(logout())
+            }
+        })
+    },[dispatch])
+  return (
+    <>
+        <Navbar/>
+        {children}
+    </>
+  )
 }
