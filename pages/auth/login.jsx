@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import {Formik, Form, Field, ErrorMessage} from 'formik'
 import {signInWithEmailAndPassword, signInWithPopup, GithubAuthProvider, FacebookAuthProvider, GoogleAuthProvider} from 'firebase/auth'
-import { auth } from '../config/firebase'
+import { auth } from '../../config/firebase'
 import {useRouter} from 'next/router'
-import {providerLogin,signInMethods} from '../libs/auth'
+import {providerLogin,signInMethods} from '../../libs/auth'
 
 
 export default function Login() {

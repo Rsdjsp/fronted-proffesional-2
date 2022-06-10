@@ -10,35 +10,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User{
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  idProvider String @unique
   name String
   profilePic String
+  idProvider String @unique
   provider String
-  post Post[] @relation(name: "author")
+  posts Post[] @relation(name: "author") //Publicaciones del usuario
   comments Comment[]
-  likesPostIds String[] @db.ObjectId
-  likes Post[] @relation(name: "likes", fields: [likesPostIds], references: [id])
+  likesPostsIds String[] @db.ObjectId
+  likes Post[] @relation(name:"likes",fields: [likesPostsIds],references: [id]) // Publicaciones a las que le dio like el usuario
+  myFriendsIds String[] @db.ObjectId
+  myFriends User[] @relation("myFriends",fields: [myFriendsIds],references: [id])
+  frienOfids String[]  @db.ObjectId
+  friendOf User[] @relation("myFriends",fields: [frienOfids],references: [id])
+  friendShipRequestsSendedIds String[]  @db.ObjectId
+  friendshipRequestsSended User[] @relation("friendshipRequests",fields: [friendShipRequestsSendedIds], references: [id])
+  friendShipRequestReceivedIds String[]  @db.ObjectId
+  friendshipRequestsReceived User[] @relation("friendshipRequests",fields: [friendShipRequestReceivedIds], references: [id])
 }
 
+
 model Post{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  content String
-  image String
-  author User @relation(name: "author", fields: [authorId], references: [id])
-  authorId String @db.ObjectId
-  likesUserIDs String[] @db.ObjectId
-  likes User[] @relation(name: "likes", fields: [likesUserIDs], references: [id])
-  comments Comment[] 
+   id String @id @default(auto()) @map("_id") @db.ObjectId
+   content String
+   image String
+   author User @relation(name: "author",fields: [authorId],references: [id])
+   authorId String @db.ObjectId
+   likesUserIDs String[] @db.ObjectId
+   likes User[] @relation(name:"likes",fields: [likesUserIDs], references: [id])
+   comments Comment[]
 }
 
 model Comment{
   id String @id @default(auto()) @map("_id") @db.ObjectId
   message String
-  author User @relation(fields: [authorId], references: [id])
+  author User @relation(fields: [authorId],references: [id])
   authorId String @db.ObjectId
-  post Post @relation(fields: [postId], references: [id])
+  post Post @relation(fields: [postId],references: [id])
   postId String @db.ObjectId
 }

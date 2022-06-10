@@ -1,18 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 const client = new PrismaClient()
 
-let prisma
-
-if (process.env.NODE_ENV == "production") {
-    prisma = new PrismaClient()
-} else {
-    if (!globalThis.prisma) {
-        globalThis.prisma = new PrismaClient()
-    }
-
-    prisma = globalThis.prisma
+export default async function getAll(req, res) {
+    const { idUser } = req.query
+    const users = await client.user.findMany({
+        where: {
+            id: {
+                notIn: [idUser]
+            }
+        }
+    })
+    return res.json(users)
 }
-
-export default prisma
-
-
